@@ -12,13 +12,13 @@ public class UrfRasterConverter : IDocumentConverter
     public bool CanConvert(string mimeType) =>
         string.Equals(mimeType, "image/urf", StringComparison.OrdinalIgnoreCase);
 
-    public Task ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
+    public Task<int> ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
     {
-        Convert(input, output);
-        return Task.CompletedTask;
+        int pageCount = Convert(input, output);
+        return Task.FromResult(pageCount);
     }
 
-    private void Convert(byte[] input, Stream output)
+    private int Convert(byte[] input, Stream output)
     {
         int offset = 0;
 
@@ -38,13 +38,14 @@ public class UrfRasterConverter : IDocumentConverter
         {
             throw new InvalidDataException("Truncated Apple URF header.");
         }
-        uint pageCount = input.ReadUInt32BE(offset);
+        uint headerPageCount = input.ReadUInt32BE(offset);
         offset += 4;
 
         using var pdfDocument = SKDocument.CreatePdf(output);
+        int pagesWritten = 0;
 
         // 2. Loop through pages
-        for (int p = 0; p < pageCount || (pageCount == 0 && offset < input.Length); p++)
+        for (int p = 0; p < headerPageCount || (headerPageCount == 0 && offset < input.Length); p++)
         {
             if (offset >= input.Length)
                 break;
@@ -149,8 +150,10 @@ public class UrfRasterConverter : IDocumentConverter
             }
 
             pdfDocument.WritePageToPdf(rgbaPixels, (int)width, (int)height, (int)dpi, (int)dpi);
+            pagesWritten++;
         }
 
         pdfDocument.Close();
+        return pagesWritten;
     }
 }

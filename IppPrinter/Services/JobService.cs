@@ -7,6 +7,9 @@ using SharpIpp.Models.Requests;
 using SharpIpp.Protocol.Models;
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Text;
+using System.Text.RegularExpressions;
+using UglyToad.PdfPig;
 
 namespace IppPrinter.Services;
 
@@ -32,20 +35,24 @@ public class JobService(
             var defaultMedia = printerOptions.Value.Media != null && printerOptions.Value.Media.Length > 0 ? printerOptions.Value.Media[0].Value : null;
             var media = jobAttributes?.Media is Media m ? m.Value : defaultMedia;
 
+            int totalPages = 0;
             for (var i = 0; i < job.Requests.Count; i++)
             {
                 var prefix = $"{job.Id}.{i}";
                 switch (job.Requests[i])
                 {
                     case PrintJobRequest printJobRequest:
-                        await SaveAsync(prefix, printJobRequest, media, cancellationToken);
+                        totalPages += await SaveAsync(prefix, printJobRequest, media, cancellationToken);
                         break;
                     case SendDocumentRequest sendJobRequest:
-                        await SaveAsync(prefix, sendJobRequest, media, cancellationToken);
+                        totalPages += await SaveAsync(prefix, sendJobRequest, media, cancellationToken);
                         break;
                 }
             }
-            await printerService.AddCompletedJobAsync(job.Id);
+            int? completedImpressions = job.Impressions.HasValue && job.Impressions.Value > 0
+                ? job.Impressions.Value
+                : (totalPages > 0 ? totalPages : 1);
+            await printerService.AddCompletedJobAsync(job.Id, completedImpressions);
         }
         catch (Exception ex)
         {
@@ -54,7 +61,7 @@ public class JobService(
         }
     }
 
-    private Task SaveAsync(string prefix, PrintJobRequest request, string? media, CancellationToken cancellationToken)
+    private Task<int> SaveAsync(string prefix, PrintJobRequest request, string? media, CancellationToken cancellationToken)
     {
         return ProcessAndSaveDocumentAsync(
             prefix,
@@ -65,7 +72,7 @@ public class JobService(
             cancellationToken);
     }
 
-    private Task SaveAsync(string prefix, SendDocumentRequest request, string? media, CancellationToken cancellationToken)
+    private Task<int> SaveAsync(string prefix, SendDocumentRequest request, string? media, CancellationToken cancellationToken)
     {
         return ProcessAndSaveDocumentAsync(
             prefix,
@@ -76,7 +83,7 @@ public class JobService(
             cancellationToken);
     }
 
-    private async Task ProcessAndSaveDocumentAsync(
+    private async Task<int> ProcessAndSaveDocumentAsync(
         string prefix,
         Stream? document,
         string? documentFormat,
@@ -85,7 +92,7 @@ public class JobService(
         CancellationToken cancellationToken)
     {
         if (document == null)
-            return;
+            return 0;
 
         if (document.Position > 0)
             document.Seek(0, SeekOrigin.Begin);
@@ -104,13 +111,14 @@ public class JobService(
             }
         }
 
+        int pageCount = 1;
         var converter = format != null ? converters.FirstOrDefault(c => c.CanConvert(format)) : null;
         if (converter != null)
         {
             var pdfStream = new MemoryStream();
             try
             {
-                await converter.ConvertToPdfAsync(stream, pdfStream, media, cancellationToken);
+                pageCount = await converter.ConvertToPdfAsync(stream, pdfStream, media, cancellationToken);
                 pdfStream.Seek(0, SeekOrigin.Begin);
                 stream = pdfStream;
                 finalFormat = "application/pdf";
@@ -123,11 +131,58 @@ public class JobService(
             }
         }
 
-        await SaveAsync(stream, GetFileName(prefix, documentName, finalFormat), cancellationToken);
+        var fileName = GetFileName(prefix, documentName, finalFormat);
+        var savedPath = await SaveAsync(stream, fileName, cancellationToken);
+
+        if (converter == null && string.Equals(finalFormat, "application/pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            pageCount = CountPdfPages(stream, savedPath);
+        }
+
         if (stream != document)
         {
             await stream.DisposeAsync();
         }
+        return pageCount;
+    }
+
+    private int CountPdfPages(Stream stream, string savedPath)
+    {
+        if (stream.CanSeek)
+        {
+            try
+            {
+                var originalPos = stream.Position;
+                stream.Seek(0, SeekOrigin.Begin);
+                using var document = PdfDocument.Open(stream, new ParsingOptions { UseLenientParsing = true, ClipPaths = false });
+                var count = document.NumberOfPages;
+                stream.Seek(originalPos, SeekOrigin.Begin);
+                if (count > 0)
+                    return count;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to parse PDF page count from stream with PdfPig");
+            }
+        }
+
+        if (fileSystem.File.Exists(savedPath))
+        {
+            try
+            {
+                using var fileStream = fileSystem.FileStream.New(savedPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var document = PdfDocument.Open(fileStream, new ParsingOptions { UseLenientParsing = true, ClipPaths = false });
+                var count = document.NumberOfPages;
+                if (count > 0)
+                    return count;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to parse PDF page count from saved file '{SavedPath}' with PdfPig", savedPath);
+            }
+        }
+
+        return 1;
     }
 
     private static string? SniffFormat(Stream stream)
@@ -279,7 +334,7 @@ public class JobService(
         }
     }
 
-    private async Task SaveAsync(Stream stream, string fileName, CancellationToken cancellationToken)
+    private async Task<string> SaveAsync(Stream stream, string fileName, CancellationToken cancellationToken)
     {
         var jobsPath = GetJobsPath();
         var path = fileSystem.Path.Combine(jobsPath, fileName);
@@ -290,6 +345,7 @@ public class JobService(
         }
 
         ExecutePostProcess(path);
+        return path;
     }
 
     private void ExecutePostProcess(string filePath)

@@ -527,7 +527,7 @@ public class PrinterService(
                 CompressionSupported = !IsRequired(IppAttributeNames.CompressionSupported) ? null : [Compression.None],
                 ConfirmationSheetPrintDefault = !IsRequired(IppAttributeNames.ConfirmationSheetPrintDefault) ? null : default,
                 CopiesDefault = !IsRequired(IppAttributeNames.CopiesDefault) ? null : options.Copies,
-                CopiesSupported = !IsRequired(IppAttributeNames.CopiesSupported) ? null : new SharpIpp.Protocol.Models.Range(options.Copies, options.Copies),
+                CopiesSupported = !IsRequired(IppAttributeNames.CopiesSupported) ? null : new SharpIpp.Protocol.Models.Range(1, options.MaxCopies),
                 CoverBackDefault = !IsRequired(IppAttributeNames.CoverBackDefault) ? null : default,
                 CoverBackSupported = !IsRequired(IppAttributeNames.CoverBackSupported) ? null : default,
                 CoverFrontDefault = !IsRequired(IppAttributeNames.CoverFrontDefault) ? null : default,
@@ -605,6 +605,7 @@ public class PrinterService(
                     IppAttributeNames.Finishings,
                     IppAttributeNames.IppAttributeFidelity,
                     IppAttributeNames.JobHoldUntil,
+                    IppAttributeNames.JobImpressions,
                     IppAttributeNames.JobName,
                     IppAttributeNames.JobPriority,
                     IppAttributeNames.JobSheets,
@@ -631,7 +632,7 @@ public class PrinterService(
                 JobHoldUntilSupported = !IsRequired(IppAttributeNames.JobHoldUntilSupported) ? null : options.JobHoldUntilSupported,
                 JobHoldUntilTimeSupported = !IsRequired(IppAttributeNames.JobHoldUntilTimeSupported) ? null : false,
                 JobIdsSupported = !IsRequired(IppAttributeNames.JobIdsSupported) ? null : true,
-                JobImpressionsSupported = !IsRequired(IppAttributeNames.JobImpressionsSupported) ? null : default,
+                JobImpressionsSupported = !IsRequired(IppAttributeNames.JobImpressionsSupported) ? null : new SharpIpp.Protocol.Models.Range(1, int.MaxValue),
                 JobKOctetsSupported = !IsRequired(IppAttributeNames.JobKOctetsSupported) ? null : default,
                 JobMandatoryAttributesSupported = !IsRequired(IppAttributeNames.JobMandatoryAttributesSupported) ? null : default,
                 JobMediaSheetsSupported = !IsRequired(IppAttributeNames.JobMediaSheetsSupported) ? null : default,
@@ -997,7 +998,9 @@ public class PrinterService(
             OrientationRequestedActual = !IsRequired(IppAttributeNames.OrientationRequested) ? null : jobAttributes?.OrientationRequested is Orientation orientationRequested ? [ orientationRequested ] : null,
             JobPriorityActual = !IsRequired(IppAttributeNames.JobPriority) ? null : jobAttributes?.JobPriority is int jobPriority ? [ jobPriority ] : null,
             JobHoldUntilActual = !IsRequired(IppAttributeNames.JobHoldUntil) ? null : jobAttributes?.JobHoldUntil is JobHoldUntil jobHoldUntil ? [ jobHoldUntil ] : null,
-            NumberUpActual = !IsRequired(IppAttributeNames.NumberUp) ? null : jobAttributes?.NumberUp is int numberUp ? [ numberUp ] : null
+            NumberUpActual = !IsRequired(IppAttributeNames.NumberUp) ? null : jobAttributes?.NumberUp is int numberUp ? [ numberUp ] : null,
+            JobImpressions = !IsRequired(IppAttributeNames.JobImpressions) ? null : job.Impressions ?? job.ImpressionsCompleted,
+            JobImpressionsCompleted = !IsRequired(IppAttributeNames.JobImpressionsCompleted) ? null : job.ImpressionsCompleted ?? (job.State == JobState.Completed ? job.Impressions ?? 1 : 0)
         };
         return attributes;
     }
@@ -1033,7 +1036,10 @@ public class PrinterService(
             return response;
         }
 
-        var job = new PrinterJob(GetNextValue(), request.OperationAttributes?.RequestingUserName, dateTimeOffsetProvider.UtcNow);
+        var job = new PrinterJob(GetNextValue(), request.OperationAttributes?.RequestingUserName, dateTimeOffsetProvider.UtcNow)
+        {
+            Impressions = request.OperationAttributes?.JobImpressions ?? request.OperationAttributes?.JobImpressionsEstimated
+        };
         response.JobAttributes.JobId = job.Id;
         FillWithDefaultValues(job.Id, request.OperationAttributes ??= new());
         FillWithDefaultValues(request.JobTemplateAttributes ??= new());
@@ -1087,11 +1093,15 @@ public class PrinterService(
         return copy;
     }
 
-    public async Task AddCompletedJobAsync(int jobId)
+    public async Task AddCompletedJobAsync(int jobId, int? impressionsCompleted = null)
     {
         if (!_jobs.TryGetValue(jobId, out var job))
             return;
         var copy = new PrinterJob(job);
+        if (impressionsCompleted.HasValue)
+            copy.ImpressionsCompleted = impressionsCompleted.Value;
+        else
+            copy.ImpressionsCompleted ??= copy.Impressions ?? 1;
         if (!copy.TrySetState(JobState.Completed, dateTimeOffsetProvider.UtcNow))
             return;
         if (!_jobs.TryUpdate(jobId, copy, job))
@@ -1147,7 +1157,10 @@ public class PrinterService(
             }
         }
 
-        var job = new PrinterJob(GetNextValue(), request.OperationAttributes?.RequestingUserName, dateTimeOffsetProvider.UtcNow);
+        var job = new PrinterJob(GetNextValue(), request.OperationAttributes?.RequestingUserName, dateTimeOffsetProvider.UtcNow)
+        {
+            Impressions = request.OperationAttributes?.JobImpressions ?? request.OperationAttributes?.JobImpressionsEstimated
+        };
         response.JobAttributes.JobId = job.Id;
         FillWithDefaultValues(job.Id, request.OperationAttributes ??= new());
         FillWithDefaultValues(request.JobTemplateAttributes ??= new());
@@ -1389,7 +1402,7 @@ public class PrinterService(
                 PrintQualitySupported = !IsRequired("print-quality-supported") && !IsRequired("print-quality") ? null : options.PrintQuality,
                 NumberUpSupported = !IsRequired("number-up-supported") && !IsRequired("number-up") ? null : [new SharpIpp.Protocol.Models.Range(1, 1)],
                 PrinterResolutionSupported = !IsRequired("printer-resolution-supported") && !IsRequired("printer-resolution") ? null : options.Resolution,
-                CopiesSupported = !IsRequired("copies-supported") && !IsRequired("copies") ? null : new SharpIpp.Protocol.Models.Range(options.Copies, options.Copies),
+                CopiesSupported = !IsRequired("copies-supported") && !IsRequired("copies") ? null : new SharpIpp.Protocol.Models.Range(1, options.MaxCopies),
                 JobHoldUntilSupported = !IsRequired("job-hold-until-supported") && !IsRequired("job-hold-until") ? null : options.JobHoldUntilSupported
             }
         };

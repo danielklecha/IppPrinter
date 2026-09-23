@@ -13,7 +13,7 @@ public static class DocumentConverterExtensions
 {
     private static readonly Regex MediaRegex = new(@"_([0-9.]+)[xX]([0-9.]+)(in|mm)$", RegexOptions.Compiled);
 
-    public static async Task ConvertToPdfAsync(
+    public static async Task<int> ConvertToPdfAsync(
         this IDocumentConverter converter,
         Stream input,
         Stream output,
@@ -29,11 +29,13 @@ public static class DocumentConverterExtensions
         using var memoryOutput = new MemoryStream();
 
         // 3. Delegate to the specific converter
-        await converter.ConvertAsync(inputBytes, memoryOutput, mediaName, cancellationToken);
+        int pageCount = await converter.ConvertAsync(inputBytes, memoryOutput, mediaName, cancellationToken);
 
         // 4. Asynchronously write the generated PDF back to the output stream
         memoryOutput.Position = 0;
         await memoryOutput.CopyToAsync(output, cancellationToken);
+
+        return pageCount;
     }
 
     public static void WritePageToPdf(this SKDocument pdfDocument, byte[] rgbaPixels, int width, int height, int dpiX, int dpiY)

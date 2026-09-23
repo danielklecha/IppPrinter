@@ -28,6 +28,8 @@ public class PrinterJob : IEquatable<PrinterJob>, IDisposable, IAsyncDisposable
         ProcessingDateTime = printerJob.ProcessingDateTime;
         State = printerJob.State;
         Requests = printerJob.Requests;
+        Impressions = printerJob.Impressions;
+        ImpressionsCompleted = printerJob.ImpressionsCompleted;
     }
 
     public int Id { get; }
@@ -37,6 +39,8 @@ public class PrinterJob : IEquatable<PrinterJob>, IDisposable, IAsyncDisposable
     public DateTimeOffset CreatedDateTime { get; }
     public DateTimeOffset? CompletedDateTime { get; set; }
     public DateTimeOffset? ProcessingDateTime { get; set; }
+    public int? Impressions { get; set; }
+    public int? ImpressionsCompleted { get; set; }
     public bool IsNew => !State.HasValue && !ProcessingDateTime.HasValue;
     public bool IsHold => !State.HasValue && ProcessingDateTime.HasValue;
 
@@ -49,6 +53,8 @@ public class PrinterJob : IEquatable<PrinterJob>, IDisposable, IAsyncDisposable
             && CreatedDateTime == other.CreatedDateTime
             && CompletedDateTime == other.CompletedDateTime
             && ProcessingDateTime == other.ProcessingDateTime
+            && Impressions == other.Impressions
+            && ImpressionsCompleted == other.ImpressionsCompleted
             && other.Requests.SequenceEqual(Requests);
     }
 
@@ -59,7 +65,7 @@ public class PrinterJob : IEquatable<PrinterJob>, IDisposable, IAsyncDisposable
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, State, Requests);
+        return HashCode.Combine(Id, State, Requests, Impressions, ImpressionsCompleted);
     }
 
     public static bool operator ==(PrinterJob? left, PrinterJob? right)

@@ -8,7 +8,11 @@ public class PrinterOptions
     public string DnsSdName { get; set; } = "IppPrinter [231076]";
     public Guid UUID { get; set; } = new Guid("d178b387-3a93-4d17-a561-007f876c4901");
     public string FirmwareName { get; set; } = "SIN22183498";
-    public Sides[] Sides { get; set; } = [SharpIpp.Protocol.Models.Sides.OneSided];
+    public Sides[] Sides { get; set; } = [
+        SharpIpp.Protocol.Models.Sides.OneSided,
+        SharpIpp.Protocol.Models.Sides.TwoSidedLongEdge,
+        SharpIpp.Protocol.Models.Sides.TwoSidedShortEdge
+    ];
     public PrintScaling[] PrintScaling { get; set; } = [SharpIpp.Protocol.Models.PrintScaling.Auto];
     public Media[] Media { get; set; } = [
         "iso_a4_210x297mm",
@@ -50,6 +54,7 @@ public class PrinterOptions
     public PrintQuality[] PrintQuality { get; set; } = [SharpIpp.Protocol.Models.PrintQuality.High];
     public int JobPriority { get; set; } = 1;
     public int Copies { get; set; } = 1;
+    public int MaxCopies { get; set; } = 9999;
     public Orientation Orientation { get; set; } = Orientation.Portrait;
     public JobHoldUntil JobHoldUntil { get; set; } = JobHoldUntil.NoHold;
     public DocumentFormat DocumentFormat { get; set; } = DocumentFormat.ApplicationPdf;

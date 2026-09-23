@@ -23,10 +23,10 @@ public class ImageConverter : IDocumentConverter
     public bool CanConvert(string mimeType) =>
         SupportedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase);
 
-    public Task ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
+    public Task<int> ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
     {
         Convert(input, output, mediaName);
-        return Task.CompletedTask;
+        return Task.FromResult(1);
     }
 
     private void Convert(byte[] input, Stream output, string? mediaName)

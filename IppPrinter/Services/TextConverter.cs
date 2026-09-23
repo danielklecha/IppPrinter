@@ -13,7 +13,7 @@ public class TextConverter : IDocumentConverter
     public bool CanConvert(string mimeType) =>
         string.Equals(mimeType, "text/plain", StringComparison.OrdinalIgnoreCase);
 
-    public Task ConvertAsync(
+    public Task<int> ConvertAsync(
         byte[] input,
         Stream output,
         string? mediaName = null,
@@ -48,6 +48,7 @@ public class TextConverter : IDocumentConverter
         float x = margin;
         float y = margin + fontSpacing;
         SKCanvas? canvas = null;
+        int pageCount = 0;
 
         void StartNewPage()
         {
@@ -56,6 +57,7 @@ public class TextConverter : IDocumentConverter
                 pdfDocument.EndPage();
             }
             canvas = pdfDocument.BeginPage(pageWidth, pageHeight);
+            pageCount++;
             y = margin + fontSpacing;
         }
 
@@ -85,7 +87,7 @@ public class TextConverter : IDocumentConverter
         }
 
         pdfDocument.Close();
-        return Task.CompletedTask;
+        return Task.FromResult(pageCount);
     }
 
     private static List<string> WrapText(string text, SKFont font, SKPaint paint, float maxWidth)

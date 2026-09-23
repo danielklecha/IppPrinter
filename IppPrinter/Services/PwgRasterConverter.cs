@@ -12,13 +12,13 @@ public class PwgRasterConverter : IDocumentConverter
     public bool CanConvert(string mimeType) =>
         string.Equals(mimeType, "image/pwg-raster", StringComparison.OrdinalIgnoreCase);
 
-    public Task ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
+    public Task<int> ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
     {
-        Convert(input, output);
-        return Task.CompletedTask;
+        int pageCount = Convert(input, output);
+        return Task.FromResult(pageCount);
     }
 
-    private void Convert(byte[] input, Stream output)
+    private int Convert(byte[] input, Stream output)
     {
         int offset = 0;
         
@@ -35,6 +35,7 @@ public class PwgRasterConverter : IDocumentConverter
         }
 
         using var pdfDocument = SKDocument.CreatePdf(output);
+        int pageCount = 0;
 
         // 2. Loop through pages
         while (offset < input.Length)
@@ -128,8 +129,10 @@ public class PwgRasterConverter : IDocumentConverter
             }
 
             pdfDocument.WritePageToPdf(rgbaPixels, (int)width, (int)height, (int)xResolution, (int)yResolution);
+            pageCount++;
         }
 
         pdfDocument.Close();
+        return pageCount;
     }
 }

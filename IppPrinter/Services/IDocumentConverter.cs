@@ -7,5 +7,5 @@ namespace IppPrinter.Services;
 public interface IDocumentConverter
 {
     bool CanConvert(string mimeType);
-    Task ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default);
+    Task<int> ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default);
 }
