@@ -1,4 +1,5 @@
 using IppPrinter.Extensions;
+using SharpIpp.Protocol.Models;
 using SkiaSharp;
 using System;
 using System.IO;
@@ -9,8 +10,8 @@ namespace IppPrinter.Services;
 
 public class UrfRasterConverter : IDocumentConverter
 {
-    public bool CanConvert(string mimeType) =>
-        string.Equals(mimeType, "image/urf", StringComparison.OrdinalIgnoreCase);
+    public bool CanConvert(DocumentFormat documentFormat) =>
+        string.Equals(documentFormat, DocumentFormat.ImageUrf, StringComparison.OrdinalIgnoreCase);
 
     public Task<int> ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
     {

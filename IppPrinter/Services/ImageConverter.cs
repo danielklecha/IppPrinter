@@ -1,8 +1,10 @@
 using IppPrinter.Extensions;
+using SharpIpp.Protocol.Models;
 using SkiaSharp;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,7 +12,7 @@ namespace IppPrinter.Services;
 
 public class ImageConverter : IDocumentConverter
 {
-    private static readonly string[] SupportedMimeTypes =
+    private static readonly DocumentFormat[] SupportedMimeTypes =
     {
         "image/jpeg",
         "image/png",
@@ -20,8 +22,8 @@ public class ImageConverter : IDocumentConverter
         "image/tiff"
     };
 
-    public bool CanConvert(string mimeType) =>
-        SupportedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase);
+    public bool CanConvert(DocumentFormat documentFormat) =>
+        SupportedMimeTypes.Any(f => string.Equals(f, documentFormat, StringComparison.OrdinalIgnoreCase));
 
     public Task<int> ConvertAsync(byte[] input, Stream output, string? mediaName = null, CancellationToken cancellationToken = default)
     {

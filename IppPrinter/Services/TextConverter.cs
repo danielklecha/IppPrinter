@@ -1,4 +1,5 @@
 using IppPrinter.Extensions;
+using SharpIpp.Protocol.Models;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,8 @@ namespace IppPrinter.Services;
 
 public class TextConverter : IDocumentConverter
 {
-    public bool CanConvert(string mimeType) =>
-        string.Equals(mimeType, "text/plain", StringComparison.OrdinalIgnoreCase);
+    public bool CanConvert(DocumentFormat documentFormat) =>
+        string.Equals(documentFormat, DocumentFormat.TextPlain, StringComparison.OrdinalIgnoreCase);
 
     public Task<int> ConvertAsync(
         byte[] input,
