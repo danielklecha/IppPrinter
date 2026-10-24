@@ -294,7 +294,7 @@ public class PrinterService(
             {
                 JobId = jobId.Value,
                 JobState = JobState.Pending,
-                JobStateReasons = [JobStateReason.None]
+                JobStateReasons = new ([JobStateReason.None])
             }
         };
     }
@@ -366,7 +366,7 @@ public class PrinterService(
             {
                 JobId = newJob.Id,
                 JobState = JobState.Pending,
-                JobStateReasons = [JobStateReason.None]
+                JobStateReasons = new([JobStateReason.None])
             }
         };
     }
@@ -517,14 +517,14 @@ public class PrinterService(
                 ChamberTemperatureCurrent = !IsRequired(IppAttributeNames.ChamberTemperatureCurrent) ? null : default,
                 ChamberTemperatureDefault = !IsRequired(IppAttributeNames.ChamberTemperatureDefault) ? null : default,
                 ChamberTemperatureSupported = !IsRequired(IppAttributeNames.ChamberTemperatureSupported) ? null : default,
-                CharsetConfigured = !IsRequired(IppAttributeNames.CharsetConfigured) ? null : "utf-8",
-                CharsetSupported = !IsRequired(IppAttributeNames.CharsetSupported) ? null : ["utf-8"],
+                CharsetConfigured = !IsRequired(IppAttributeNames.CharsetConfigured) ? (Charset?)null : Charset.Utf8,
+                CharsetSupported = !IsRequired(IppAttributeNames.CharsetSupported) ? null : new([Charset.Utf8]),
                 ClientInfoSupported = !IsRequired(IppAttributeNames.ClientInfoSupported) ? null : default,
                 CoatingSidesSupported = !IsRequired(IppAttributeNames.CoatingSidesSupported) ? null : default,
                 CoatingTypeSupported = !IsRequired(IppAttributeNames.CoatingTypeSupported) ? null : default,
                 ColorSupported = !IsRequired(IppAttributeNames.ColorSupported) ? null : (options.ColorSupported ?? options.PrintColorModes.Contains(PrintColorMode.Color)),
                 CompressionDefault = !IsRequired(IppAttributeNames.CompressionDefault) ? (Compression?)null : Compression.None,
-                CompressionSupported = !IsRequired(IppAttributeNames.CompressionSupported) ? null : [Compression.None],
+                CompressionSupported = !IsRequired(IppAttributeNames.CompressionSupported) ? null : new([Compression.None]),
                 ConfirmationSheetPrintDefault = !IsRequired(IppAttributeNames.ConfirmationSheetPrintDefault) ? null : default,
                 CopiesDefault = !IsRequired(IppAttributeNames.CopiesDefault) ? null : options.Copies,
                 CopiesSupported = !IsRequired(IppAttributeNames.CopiesSupported) ? null : new SharpIpp.Protocol.Models.Range(1, options.MaxCopies),
@@ -542,13 +542,13 @@ public class PrinterService(
                 DestinationUrisSupported = !IsRequired(IppAttributeNames.DestinationUrisSupported) ? null : default,
                 DocumentAccessSupported = !IsRequired(IppAttributeNames.DocumentAccessSupported) ? null : default,
                 DocumentCharsetDefault = !IsRequired(IppAttributeNames.DocumentCharsetDefault) ? (Charset?)null : Charset.Utf8,
-                DocumentCharsetSupported = !IsRequired(IppAttributeNames.DocumentCharsetSupported) ? null : [Charset.Utf8],
+                DocumentCharsetSupported = !IsRequired(IppAttributeNames.DocumentCharsetSupported) ? null : new([Charset.Utf8]),
                 DocumentCreationAttributesSupported = !IsRequired(IppAttributeNames.DocumentCreationAttributesSupported) ? null : default,
                 DocumentFormatDefault = !IsRequired(IppAttributeNames.DocumentFormatDefault) ? (DocumentFormat?)null : options.DocumentFormat,
-                DocumentFormatDetailsSupported = !IsRequired(IppAttributeNames.DocumentFormatDetailsSupported) ? null : [],
-                DocumentFormatSupported = !IsRequired(IppAttributeNames.DocumentFormatSupported) ? null : options.DocumentFormatSupported.Select(x => x.ToString()).ToArray(),
+                DocumentFormatDetailsSupported = !IsRequired(IppAttributeNames.DocumentFormatDetailsSupported) ? null : new([]),
+                DocumentFormatSupported = !IsRequired(IppAttributeNames.DocumentFormatSupported) ? null : options.DocumentFormatSupported,
                 DocumentNaturalLanguageDefault = !IsRequired(IppAttributeNames.DocumentNaturalLanguageDefault) ? (NaturalLanguage?)null : options.NaturalLanguageConfigured,
-                DocumentNaturalLanguageSupported = !IsRequired(IppAttributeNames.DocumentNaturalLanguageSupported) ? null : [options.NaturalLanguageConfigured],
+                DocumentNaturalLanguageSupported = !IsRequired(IppAttributeNames.DocumentNaturalLanguageSupported) ? null : new([options.NaturalLanguageConfigured]),
                 DocumentPasswordSupported = !IsRequired(IppAttributeNames.DocumentPasswordSupported) ? null : default,
                 FetchDocumentAttributesSupported = !IsRequired(IppAttributeNames.FetchDocumentAttributesSupported) ? null : default,
                 FinishingsColDatabase = !IsRequired(IppAttributeNames.FinishingsColDatabase) ? null : default,
@@ -563,7 +563,7 @@ public class PrinterService(
                 FoldingReferenceEdgeSupported = !IsRequired(IppAttributeNames.FoldingReferenceEdgeSupported) ? null : default,
                 ForceFrontSideSupported = !IsRequired(IppAttributeNames.ForceFrontSideSupported) ? null : default,
                 FromNameSupported = !IsRequired(IppAttributeNames.FromNameSupported) ? null : default,
-                GeneratedNaturalLanguageSupported = !IsRequired(IppAttributeNames.GeneratedNaturalLanguageSupported) ? null : [options.NaturalLanguage],
+                GeneratedNaturalLanguageSupported = !IsRequired(IppAttributeNames.GeneratedNaturalLanguageSupported) ? null : new([options.NaturalLanguage]),
                 ImageOrientationDefault = !IsRequired(IppAttributeNames.ImageOrientationDefault) ? null : default,
                 ImageOrientationSupported = !IsRequired(IppAttributeNames.ImageOrientationSupported) ? null : default,
                 ImpositionTemplateDefault = !IsRequired(IppAttributeNames.ImpositionTemplateDefault) ? null : default,
@@ -583,7 +583,7 @@ public class PrinterService(
                 InsertSheetDefault = !IsRequired(IppAttributeNames.InsertSheetDefault) ? null : default,
                 InsertSheetSupported = !IsRequired(IppAttributeNames.InsertSheetSupported) ? null : default,
                 IppFeaturesSupported = !IsRequired(IppAttributeNames.IppFeaturesSupported) ? null : default,
-                IppVersionsSupported = !IsRequired(IppAttributeNames.IppVersionsSupported) ? null : [new IppVersion(1, 0), new IppVersion(1, 1), new IppVersion(2, 0), new IppVersion(2, 1), new IppVersion(2, 2)],
+                IppVersionsSupported = !IsRequired(IppAttributeNames.IppVersionsSupported) ? null : new IppVersion[] { new IppVersion(1, 0), new IppVersion(1, 1), new IppVersion(2, 0), new IppVersion(2, 1), new IppVersion(2, 2) },
                 JobAccountIdDefault = !IsRequired(IppAttributeNames.JobAccountIdDefault) ? null : default,
                 JobAccountIdSupported = !IsRequired(IppAttributeNames.JobAccountIdSupported) ? null : default,
                 JobAccountingOutputBinSupported = !IsRequired(IppAttributeNames.JobAccountingOutputBinSupported) ? null : default,
@@ -600,7 +600,7 @@ public class PrinterService(
                 JobCompleteBeforeSupported = !IsRequired(IppAttributeNames.JobCompleteBeforeSupported) ? null : default,
                 JobCompleteBeforeTimeSupported = !IsRequired(IppAttributeNames.JobCompleteBeforeTimeSupported) ? null : default,
                 JobConstraintsSupported = !IsRequired(IppAttributeNames.JobConstraintsSupported) ? null : default,
-                JobCreationAttributesSupported = !IsRequired(IppAttributeNames.JobCreationAttributesSupported) ? null : [
+                JobCreationAttributesSupported = !IsRequired(IppAttributeNames.JobCreationAttributesSupported) ? null : new([
                     IppAttributeNames.Copies,
                     IppAttributeNames.Finishings,
                     IppAttributeNames.IppAttributeFidelity,
@@ -615,17 +615,17 @@ public class PrinterService(
                     IppAttributeNames.PrintQuality,
                     IppAttributeNames.PrinterResolution,
                     IppAttributeNames.Sides
-                ],
+                ]),
                 JobDelayOutputUntilDefault = !IsRequired(IppAttributeNames.JobDelayOutputUntilDefault) ? (JobHoldUntil?)null : JobHoldUntil.NoHold,
-                JobDelayOutputUntilSupported = !IsRequired(IppAttributeNames.JobDelayOutputUntilSupported) ? null : [JobHoldUntil.NoHold],
+                JobDelayOutputUntilSupported = !IsRequired(IppAttributeNames.JobDelayOutputUntilSupported) ? null : new([JobHoldUntil.NoHold]),
                 JobDelayOutputUntilTimeSupported = !IsRequired(IppAttributeNames.JobDelayOutputUntilTimeSupported) ? null : default,
                 JobDestinationSpoolingSupported = !IsRequired(IppAttributeNames.JobDestinationSpoolingSupported) ? null : default,
                 JobErrorSheetDefault = !IsRequired(IppAttributeNames.JobErrorSheetDefault) ? null : default,
                 JobErrorSheetSupported = !IsRequired(IppAttributeNames.JobErrorSheetSupported) ? null : default,
                 JobErrorSheetTypeSupported = !IsRequired(IppAttributeNames.JobErrorSheetTypeSupported) ? null : default,
                 JobErrorSheetWhenSupported = !IsRequired(IppAttributeNames.JobErrorSheetWhenSupported) ? null : default,
-                JobHistoryAttributesConfigured = !IsRequired(IppAttributeNames.JobHistoryAttributesConfigured) ? null : [JobHistoryAttribute.JobId, JobHistoryAttribute.JobName, JobHistoryAttribute.JobState, JobHistoryAttribute.JobStateReasons],
-                JobHistoryAttributesSupported = !IsRequired(IppAttributeNames.JobHistoryAttributesSupported) ? null : [JobHistoryAttribute.JobId, JobHistoryAttribute.JobName, JobHistoryAttribute.JobState, JobHistoryAttribute.JobStateReasons],
+                JobHistoryAttributesConfigured = !IsRequired(IppAttributeNames.JobHistoryAttributesConfigured) ? null : new([JobHistoryAttribute.JobId, JobHistoryAttribute.JobName, JobHistoryAttribute.JobState, JobHistoryAttribute.JobStateReasons]),
+                JobHistoryAttributesSupported = !IsRequired(IppAttributeNames.JobHistoryAttributesSupported) ? null : new([JobHistoryAttribute.JobId, JobHistoryAttribute.JobName, JobHistoryAttribute.JobState, JobHistoryAttribute.JobStateReasons]),
                 JobHistoryIntervalConfigured = !IsRequired(IppAttributeNames.JobHistoryIntervalConfigured) ? null : 0,
                 JobHistoryIntervalSupported = !IsRequired(IppAttributeNames.JobHistoryIntervalSupported) ? null : new SharpIpp.Protocol.Models.Range(0, int.MaxValue),
                 JobHoldUntilDefault = !IsRequired(IppAttributeNames.JobHoldUntilDefault) ? (JobHoldUntil?)null : options.JobHoldUntil,
@@ -652,13 +652,13 @@ public class PrinterService(
                 JobRetainUntilDefault = !IsRequired(IppAttributeNames.JobRetainUntilDefault) ? (JobHoldUntil?)null : JobHoldUntil.NoHold,
                 JobRetainUntilIntervalDefault = !IsRequired(IppAttributeNames.JobRetainUntilIntervalDefault) ? null : 0,
                 JobRetainUntilIntervalSupported = !IsRequired(IppAttributeNames.JobRetainUntilIntervalSupported) ? null : new SharpIpp.Protocol.Models.Range(0, int.MaxValue),
-                JobRetainUntilSupported = !IsRequired(IppAttributeNames.JobRetainUntilSupported) ? null : [JobHoldUntil.NoHold],
+                JobRetainUntilSupported = !IsRequired(IppAttributeNames.JobRetainUntilSupported) ? null : new([JobHoldUntil.NoHold]),
                 JobRetainUntilTimeSupported = !IsRequired(IppAttributeNames.JobRetainUntilTimeSupported) ? null : false,
                 JobSheetMessageSupported = !IsRequired(IppAttributeNames.JobSheetMessageSupported) ? null : default,
                 JobSheetsColDefault = !IsRequired(IppAttributeNames.JobSheetsColDefault) ? null : default,
                 JobSheetsColSupported = !IsRequired(IppAttributeNames.JobSheetsColSupported) ? null : default,
                 JobSheetsDefault = !IsRequired(IppAttributeNames.JobSheetsDefault) ? (JobSheets?)null : JobSheets.None,
-                JobSheetsSupported = !IsRequired(IppAttributeNames.JobSheetsSupported) ? null : [JobSheets.None],
+                JobSheetsSupported = !IsRequired(IppAttributeNames.JobSheetsSupported) ? null : new ([JobSheets.None]),
                 JobSpoolingSupported = !IsRequired(IppAttributeNames.JobSpoolingSupported) ? null : default,
                 JobTriggersSupported = !IsRequired(IppAttributeNames.JobTriggersSupported) ? null : default,
                 JpegKOctetsSupported = !IsRequired(IppAttributeNames.JpegKOctetsSupported) ? null : default,
@@ -691,7 +691,7 @@ public class PrinterService(
                 {
                     MediaBackCoating = MediaCoating.None,
                     MediaBottomMargin = 10,
-                    MediaColor = "black",
+                    MediaColor = new(MediaColor.Black),
                     MediaLeftMargin = 10,
                     MediaRightMargin = 10,
                     MediaTopMargin = 10,
@@ -726,7 +726,7 @@ public class PrinterService(
                 MessageSupported = !IsRequired(IppAttributeNames.MessageSupported) ? null : default,
                 MultipleDestinationUrisSupported = !IsRequired(IppAttributeNames.MultipleDestinationUrisSupported) ? null : default,
                 MultipleDocumentHandlingDefault = !IsRequired(IppAttributeNames.MultipleDocumentHandlingDefault) ? (MultipleDocumentHandling?)null : MultipleDocumentHandling.SeparateDocumentsCollatedCopies,
-                MultipleDocumentHandlingSupported = !IsRequired(IppAttributeNames.MultipleDocumentHandlingSupported) ? null : [MultipleDocumentHandling.SeparateDocumentsCollatedCopies, MultipleDocumentHandling.SeparateDocumentsUncollatedCopies],
+                MultipleDocumentHandlingSupported = !IsRequired(IppAttributeNames.MultipleDocumentHandlingSupported) ? null : new ([MultipleDocumentHandling.SeparateDocumentsCollatedCopies, MultipleDocumentHandling.SeparateDocumentsUncollatedCopies]),
                 MultipleDocumentJobsSupported = !IsRequired(IppAttributeNames.MultipleDocumentJobsSupported) ? null : options.MultipleDocumentJobsSupported,
                 MultipleObjectHandlingDefault = !IsRequired(IppAttributeNames.MultipleObjectHandlingDefault) ? null : default,
                 MultipleObjectHandlingSupported = !IsRequired(IppAttributeNames.MultipleObjectHandlingSupported) ? null : default,
@@ -736,8 +736,8 @@ public class PrinterService(
                 NumberOfRetriesDefault = !IsRequired(IppAttributeNames.NumberOfRetriesDefault) ? null : default,
                 NumberOfRetriesSupported = !IsRequired(IppAttributeNames.NumberOfRetriesSupported) ? null : default,
                 NumberUpDefault = !IsRequired(IppAttributeNames.NumberUpDefault) ? null : 1,
-                NumberUpSupported = !IsRequired(IppAttributeNames.NumberUpSupported) ? null : [new SharpIpp.Protocol.Models.Range(1, 1)],
-                OperationsSupported = !IsRequired(IppAttributeNames.OperationsSupported) ? null : [ IppOperation.PrintJob, IppOperation.ValidateJob, IppOperation.CreateJob, IppOperation.SendDocument, IppOperation.CancelJob, IppOperation.GetJobAttributes, IppOperation.GetJobs, IppOperation.GetPrinterAttributes, IppOperation.HoldJob, IppOperation.ReleaseJob, IppOperation.PausePrinter, IppOperation.ResumePrinter, IppOperation.CloseJob, IppOperation.IdentifyPrinter, IppOperation.ResubmitJob, IppOperation.CancelJobs, IppOperation.CancelMyJobs, IppOperation.SetJobAttributes, IppOperation.SetPrinterAttributes, IppOperation.GetPrinterSupportedValues, IppOperation.CreatePrinterSubscriptions, IppOperation.CancelSubscription, IppOperation.GetSubscriptionAttributes ],
+                NumberUpSupported = !IsRequired(IppAttributeNames.NumberUpSupported) ? null : new ([new SharpIpp.Protocol.Models.Range(1, 1)]),
+                OperationsSupported = !IsRequired(IppAttributeNames.OperationsSupported) ? null : new ([ IppOperation.PrintJob, IppOperation.ValidateJob, IppOperation.CreateJob, IppOperation.SendDocument, IppOperation.CancelJob, IppOperation.GetJobAttributes, IppOperation.GetJobs, IppOperation.GetPrinterAttributes, IppOperation.HoldJob, IppOperation.ReleaseJob, IppOperation.PausePrinter, IppOperation.ResumePrinter, IppOperation.CloseJob, IppOperation.IdentifyPrinter, IppOperation.ResubmitJob, IppOperation.CancelJobs, IppOperation.CancelMyJobs, IppOperation.SetJobAttributes, IppOperation.SetPrinterAttributes, IppOperation.GetPrinterSupportedValues, IppOperation.CreatePrinterSubscriptions, IppOperation.CancelSubscription, IppOperation.GetSubscriptionAttributes ]),
                 OrganizationNameSupported = !IsRequired(IppAttributeNames.OrganizationNameSupported) ? null : default,
                 OrientationRequestedDefault = !IsRequired(IppAttributeNames.OrientationRequestedDefault) ? null : options.Orientation,
                 OrientationRequestedSupported = !IsRequired(IppAttributeNames.OrientationRequestedSupported) ? null : Enum.GetValues(typeof(Orientation)).Cast<Orientation>().ToArray(),
@@ -781,7 +781,7 @@ public class PrinterService(
                 PrinterConfigChangeTime = !IsRequired(IppAttributeNames.PrinterConfigChangeTime) ? null : 0,
                 PrinterContactCol = !IsRequired(IppAttributeNames.PrinterContactCol) ? null : default,
                 PrinterCurrentTime = !IsRequired(IppAttributeNames.PrinterCurrentTime) ? null : dateTimeOffsetProvider.Now,
-                PrinterDetailedStatusMessages = !IsRequired(IppAttributeNames.PrinterDetailedStatusMessages) ? null : [],
+                PrinterDetailedStatusMessages = !IsRequired(IppAttributeNames.PrinterDetailedStatusMessages) ? null : new([]),
                 PrinterDeviceId = !IsRequired(IppAttributeNames.PrinterDeviceId) ? null : GetPrinterDeviceId(options),
                 PrinterDriverInstaller = !IsRequired(IppAttributeNames.PrinterDriverInstaller) ? null : new Uri(options.DriverInstallerUrl),
                 PrinterFaxLogUri = !IsRequired(IppAttributeNames.PrinterFaxLogUri) ? null : default,
@@ -824,14 +824,14 @@ public class PrinterService(
                 PrinterStateChangeDateTime = !IsRequired(IppAttributeNames.PrinterStateChangeDateTime) ? null : _startTime,
                 PrinterStateChangeTime = !IsRequired(IppAttributeNames.PrinterStateChangeTime) ? null : 0,
                 PrinterStateMessage = !IsRequired(IppAttributeNames.PrinterStateMessage) ? null : _isPaused ? "Paused" : _jobs.Values.Any(x => x.State == JobState.Pending || x.State == JobState.Processing) ? "Processing" : "Idle",
-                PrinterStateReasons = !IsRequired(IppAttributeNames.PrinterStateReasons) ? null : (_isPaused ? ["paused"] : ["none"]),
+                PrinterStateReasons = !IsRequired(IppAttributeNames.PrinterStateReasons) ? null : (_isPaused ? new([PrinterStateReason.Paused]) : new([PrinterStateReason.None])),
                 PrinterStaticResourceDirectoryUri = !IsRequired(IppAttributeNames.PrinterStaticResourceDirectoryUri) ? null : default,
                 PrinterStaticResourceKOctetsFree = !IsRequired(IppAttributeNames.PrinterStaticResourceKOctetsFree) ? null : default,
                 PrinterStaticResourceKOctetsSupported = !IsRequired(IppAttributeNames.PrinterStaticResourceKOctetsSupported) ? null : default,
                 PrinterSupply = !IsRequired(IppAttributeNames.PrinterSupply) || !options.SupplyReportingEnabled ? null : options.Supplies,
-                PrinterSupplyDescription = !IsRequired(IppAttributeNames.PrinterSupplyDescription) || !options.SupplyReportingEnabled ? null : options.Supplies.Select(s => $"{s.MarkerName ?? s.ColorName ?? "Supply"}: {s.Level}%").ToArray(),
+                PrinterSupplyDescription = !IsRequired(IppAttributeNames.PrinterSupplyDescription) || !options.SupplyReportingEnabled ? null : options.Supplies.Select(s => $"{s.MarkerName?.Value ?? s.ColorName ?? "Supply"}: {s.Level}%").ToArray(),
                 PrinterUpTime = !IsRequired(IppAttributeNames.PrinterUpTime) ? null : (int)(dateTimeOffsetProvider.UtcNow - _startTime).TotalSeconds,
-                PrinterUriSupported = !IsRequired(IppAttributeNames.PrinterUriSupported) ? null : [GetPrinterUrl("/ipp/print")],
+                PrinterUriSupported = !IsRequired(IppAttributeNames.PrinterUriSupported) ? null : new([GetPrinterUrl("/ipp/print")]),
                 PrinterUUID = !IsRequired(IppAttributeNames.PrinterUUID) ? null : $"urn:uuid:{options.UUID}",
                 PrinterVolumeSupported = !IsRequired(IppAttributeNames.PrinterVolumeSupported) ? null : default,
                 PrintObjectsSupported = !IsRequired(IppAttributeNames.PrintObjectsSupported) ? null : default,
@@ -871,9 +871,9 @@ public class PrinterService(
                 TrimmingReferenceEdgeSupported = !IsRequired(IppAttributeNames.TrimmingReferenceEdgeSupported) ? null : default,
                 TrimmingTypeSupported = !IsRequired(IppAttributeNames.TrimmingTypeSupported) ? null : default,
                 TrimmingWhenSupported = !IsRequired(IppAttributeNames.TrimmingWhenSupported) ? null : default,
-                UriAuthenticationSupported = !IsRequired(IppAttributeNames.UriAuthenticationSupported) ? null : [UriAuthentication.None],
-                UriSecuritySupported = !IsRequired(IppAttributeNames.UriSecuritySupported) ? null : [GetUriSecuritySupported()],
-                WhichJobsSupported = !IsRequired(IppAttributeNames.WhichJobsSupported) ? null : [WhichJobs.Completed, WhichJobs.NotCompleted, WhichJobs.All],
+                UriAuthenticationSupported = !IsRequired(IppAttributeNames.UriAuthenticationSupported) ? null : new([UriAuthentication.None]),
+                UriSecuritySupported = !IsRequired(IppAttributeNames.UriSecuritySupported) ? null : new([GetUriSecuritySupported()]),
+                WhichJobsSupported = !IsRequired(IppAttributeNames.WhichJobsSupported) ? null : new([WhichJobs.Completed, WhichJobs.NotCompleted, WhichJobs.All]),
                 XImagePositionDefault = !IsRequired(IppAttributeNames.XImagePositionDefault) ? null : default,
                 XImagePositionSupported = !IsRequired(IppAttributeNames.XImagePositionSupported) ? null : default,
                 XImageShiftDefault = !IsRequired(IppAttributeNames.XImageShiftDefault) ? null : default,
@@ -909,7 +909,7 @@ public class PrinterService(
     private GetJobsResponse GetGetJobsResponse(GetJobsRequest request)
     {
         IEnumerable<PrinterJob> jobs = GetPrinterJobs(request.OperationAttributes?.WhichJobs);
-        if (request.OperationAttributes?.MyJobs ?? false)
+        if (request.OperationAttributes != null && request.OperationAttributes.MyJobs.GetValueOrDefault())
             jobs = jobs.Where(x => x.UserName?.Equals(request.OperationAttributes.RequestingUserName) ?? false);
         jobs = jobs.OrderByDescending(x => x.State).ThenByDescending(x => x.Id);
         if (request.OperationAttributes?.Limit.HasValue ?? false)
@@ -981,7 +981,7 @@ public class PrinterService(
             JobName = !IsRequired(IppAttributeNames.JobName) ? null : jobName,
             JobPrinterUri = !IsRequired(IppAttributeNames.JobPrinterUri) ? null : GetPrinterUrl(),
             JobState = !IsRequired(IppAttributeNames.JobState) ? null : job.State,
-            JobStateReasons = !IsRequired(IppAttributeNames.JobState) ? null : [JobStateReason.None],
+            JobStateReasons = !IsRequired(IppAttributeNames.JobState) ? null : new ([JobStateReason.None]),
             DateTimeAtCreation = !IsRequired(IppAttributeNames.DateTimeAtCreation) ? null : job.CreatedDateTime,
             TimeAtCreation = !IsRequired(IppAttributeNames.TimeAtCreation) ? null : (int)(job.CreatedDateTime - _startTime).TotalSeconds,
             DateTimeAtProcessing = !IsRequired(IppAttributeNames.DateTimeAtProcessing) ? null : job.ProcessingDateTime ?? DateTimeOffset.MinValue,
@@ -990,15 +990,15 @@ public class PrinterService(
             TimeAtCompleted = !IsRequired(IppAttributeNames.TimeAtCompleted) ? null : job.CompletedDateTime.HasValue ? (int)(job.CompletedDateTime.Value - _startTime).TotalSeconds : -1,
             JobOriginatingUserName = !IsRequired(IppAttributeNames.JobOriginatingUserName) ? null : job.UserName,
             JobPrinterUpTime = !IsRequired(IppAttributeNames.JobPrinterUpTime) ? null : (int)(dateTimeOffsetProvider.UtcNow - _startTime).TotalSeconds,
-            CopiesActual = !IsRequired(IppAttributeNames.Copies) ? null : jobAttributes?.Copies is int copies ? [ copies ] : null,
-            MediaActual = !IsRequired(IppAttributeNames.Media) ? null : jobAttributes?.Media is Media media ? [ media ] : null,
-            SidesActual = !IsRequired(IppAttributeNames.Sides) ? null : jobAttributes?.Sides is Sides sides ? [ sides ] : null,
+            CopiesActual = !IsRequired(IppAttributeNames.Copies) ? null : jobAttributes?.Copies.HasValue ?? false ? new([ jobAttributes.Copies.Value ]) : null,
+            MediaActual = !IsRequired(IppAttributeNames.Media) ? null : jobAttributes?.Media.HasValue ?? false ? new([ jobAttributes.Media.Value ]) : null,
+            SidesActual = !IsRequired(IppAttributeNames.Sides) ? null : jobAttributes?.Sides.HasValue ?? false ? new([jobAttributes.Sides.Value]) : null,
             FinishingsActual = !IsRequired(IppAttributeNames.Finishings) ? null : jobAttributes?.Finishings,
-            PrinterResolutionActual = !IsRequired(IppAttributeNames.PrinterResolution) ? null : jobAttributes?.PrinterResolution is Resolution resolution ? [ resolution ] : null,
-            OrientationRequestedActual = !IsRequired(IppAttributeNames.OrientationRequested) ? null : jobAttributes?.OrientationRequested is Orientation orientationRequested ? [ orientationRequested ] : null,
-            JobPriorityActual = !IsRequired(IppAttributeNames.JobPriority) ? null : jobAttributes?.JobPriority is int jobPriority ? [ jobPriority ] : null,
-            JobHoldUntilActual = !IsRequired(IppAttributeNames.JobHoldUntil) ? null : jobAttributes?.JobHoldUntil is JobHoldUntil jobHoldUntil ? [ jobHoldUntil ] : null,
-            NumberUpActual = !IsRequired(IppAttributeNames.NumberUp) ? null : jobAttributes?.NumberUp is int numberUp ? [ numberUp ] : null,
+            PrinterResolutionActual = !IsRequired(IppAttributeNames.PrinterResolution) ? null : jobAttributes?.PrinterResolution.HasValue ?? false ? new([jobAttributes.PrinterResolution.Value]) : null,
+            OrientationRequestedActual = !IsRequired(IppAttributeNames.OrientationRequested) ? null : jobAttributes?.OrientationRequested.HasValue ?? false ? new([jobAttributes.OrientationRequested.Value]) : null,
+            JobPriorityActual = !IsRequired(IppAttributeNames.JobPriority) ? null : jobAttributes?.JobPriority.HasValue ?? false ? new([jobAttributes.JobPriority.Value]) : null,
+            JobHoldUntilActual = !IsRequired(IppAttributeNames.JobHoldUntil) ? null : jobAttributes?.JobHoldUntil.HasValue ?? false ? new([jobAttributes.JobHoldUntil.Value]) : null,
+            NumberUpActual = !IsRequired(IppAttributeNames.NumberUp) ? null : jobAttributes?.NumberUp.HasValue ?? false ? new([jobAttributes.NumberUp.Value]) : null,
             JobImpressions = !IsRequired(IppAttributeNames.JobImpressions) ? null : job.Impressions ?? job.ImpressionsCompleted,
             JobImpressionsCompleted = !IsRequired(IppAttributeNames.JobImpressionsCompleted) ? null : job.ImpressionsCompleted ?? (job.State == JobState.Completed ? job.Impressions ?? 1 : 0)
         };
@@ -1025,7 +1025,7 @@ public class PrinterService(
             JobAttributes = new()
             {
                 JobState = JobState.Pending,
-                JobStateReasons = [JobStateReason.None]
+                JobStateReasons = new ([JobStateReason.None])
             }
         };
 
@@ -1134,7 +1134,7 @@ public class PrinterService(
             {
                 JobId = 0,
                 JobState = JobState.Pending,
-                JobStateReasons = [JobStateReason.None]
+                JobStateReasons = new([JobStateReason.None])
             }
         };
 
@@ -1199,7 +1199,9 @@ public class PrinterService(
     {
         if(request.OperationAttributes is not JobOperationAttributes jobOperationAttributes)
             return null;
-        if (jobOperationAttributes.JobUri != null && int.TryParse(jobOperationAttributes.JobUri.Segments.LastOrDefault(), out int idFromUri))
+        if (jobOperationAttributes.JobUri.HasValue
+            && jobOperationAttributes.JobUri.Value.HasValue
+            && int.TryParse(jobOperationAttributes.JobUri.Value.Value.Segments.LastOrDefault(), out int idFromUri))
             return idFromUri;
         return jobOperationAttributes.JobId;
     }
@@ -1208,7 +1210,7 @@ public class PrinterService(
     {
         if (request.OperationAttributes is not CloseJobOperationAttributes attr)
             return null;
-        if (attr.JobUri != null && int.TryParse(attr.JobUri.Segments.LastOrDefault(), out int idFromUri))
+        if (attr.JobUri.HasValue && attr.JobUri.Value.HasValue && int.TryParse(attr.JobUri.Value.Value.Segments.LastOrDefault(), out int idFromUri))
             return idFromUri;
         return attr.JobId;
     }
@@ -1217,7 +1219,7 @@ public class PrinterService(
     {
         if (request.OperationAttributes is not ResubmitJobOperationAttributes attr)
             return null;
-        if (attr.JobUri != null && int.TryParse(attr.JobUri.Segments.LastOrDefault(), out int idFromUri))
+        if (attr.JobUri.HasValue && attr.JobUri.Value.HasValue && int.TryParse(attr.JobUri.Value.Value.Segments.LastOrDefault(), out int idFromUri))
             return idFromUri;
         return attr.JobId;
     }
@@ -1248,7 +1250,7 @@ public class PrinterService(
         if (attributes is null)
             return;
         var options = printerOptions.Value;
-        if (string.IsNullOrEmpty(attributes.DocumentFormat))
+        if (!attributes.DocumentFormat.HasValue || !attributes.DocumentFormat.Value.HasValue)
             attributes.DocumentFormat = options.DocumentFormat;
     }
 
@@ -1257,7 +1259,7 @@ public class PrinterService(
         if (attributes is null)
             return;
         var options = printerOptions.Value;
-        if (string.IsNullOrEmpty(attributes.DocumentFormat))
+        if (!attributes.DocumentFormat.HasValue || !attributes.DocumentFormat.Value.HasValue)
             attributes.DocumentFormat = options.DocumentFormat;
         FillWithDefaultValues(jobId, attributes as CreateJobOperationAttributes);
     }
@@ -1294,7 +1296,7 @@ public class PrinterService(
     {
         if (request.OperationAttributes is not SetJobAttributesOperationAttributes attr)
             return null;
-        if (attr.JobUri != null && int.TryParse(attr.JobUri.Segments.LastOrDefault(), out int idFromUri))
+        if (attr.JobUri.HasValue && attr.JobUri.Value.HasValue && int.TryParse(attr.JobUri.Value.Value.Segments.LastOrDefault(), out int idFromUri))
             return idFromUri;
         return attr.JobId;
     }
@@ -1400,7 +1402,7 @@ public class PrinterService(
                 SidesSupported = !IsRequired("sides-supported") && !IsRequired("sides") ? null : options.Sides,
                 OrientationRequestedSupported = !IsRequired("orientation-requested-supported") && !IsRequired("orientation-requested") ? null : Enum.GetValues(typeof(Orientation)).Cast<Orientation>().ToArray(),
                 PrintQualitySupported = !IsRequired("print-quality-supported") && !IsRequired("print-quality") ? null : options.PrintQuality,
-                NumberUpSupported = !IsRequired("number-up-supported") && !IsRequired("number-up") ? null : [new SharpIpp.Protocol.Models.Range(1, 1)],
+                NumberUpSupported = !IsRequired("number-up-supported") && !IsRequired("number-up") ? null : new ([new SharpIpp.Protocol.Models.Range(1, 1)]),
                 PrinterResolutionSupported = !IsRequired("printer-resolution-supported") && !IsRequired("printer-resolution") ? null : options.Resolution,
                 CopiesSupported = !IsRequired("copies-supported") && !IsRequired("copies") ? null : new SharpIpp.Protocol.Models.Range(1, options.MaxCopies),
                 JobHoldUntilSupported = !IsRequired("job-hold-until-supported") && !IsRequired("job-hold-until") ? null : options.JobHoldUntilSupported

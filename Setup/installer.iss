@@ -25,6 +25,7 @@ Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=admin
 SetupLogging=yes
+RestartIfNeededByRun=no
 SetupArchitecture=x64
 ArchitecturesInstallIn64BitMode=x64compatible
 LicenseFile=..\IppPrinter\bin\Release\net10.0\win-x64\publish\LICENSE.txt
