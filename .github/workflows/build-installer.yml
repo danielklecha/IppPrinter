@@ -59,14 +59,11 @@ jobs:
 
     - name: Copy Setup Installer
       run: |
-        $rawVersion = "${{ inputs.version }}"
-        if (-not $rawVersion) { $rawVersion = "1.0.0" }
-        $cleanTag = $rawVersion.TrimStart('v')
-        Copy-Item "Setup\Output\IppPrinterSetup.exe" -Destination ".\IppPrinter-v$cleanTag-x64.exe"
+        Copy-Item "Setup\Output\IppPrinterSetup.exe" -Destination ".\IppPrinter-Setup-x64.exe"
 
     - name: Upload Installer Artifact
       uses: actions/upload-artifact@v6
       with:
         name: installer-x64
-        path: .\IppPrinter-*-x64.exe
+        path: .\IppPrinter-Setup-x64.exe
         retention-days: 1

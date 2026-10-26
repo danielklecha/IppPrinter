@@ -42,36 +42,21 @@ jobs:
       run: dotnet publish --no-restore --configuration Release --runtime win-x64 --no-self-contained
 
     - name: Pack win-x64
-      run: |
-        rawVersion="${{ inputs.version }}"
-        if [ -z "$rawVersion" ]; then rawVersion="1.0.0"; fi
-        tag="$rawVersion"
-        if [[ "$tag" != v* ]]; then tag="v$tag"; fi
-        zip -qq -r "$GITHUB_WORKSPACE/IppPrinter-$tag-win-x64.zip" *
+      run: zip -qq -r "$GITHUB_WORKSPACE/IppPrinter-win-x64.zip" *
       working-directory: IppPrinter/bin/Release/net10.0/win-x64/publish/
 
     - name: Publish linux-x64
       run: dotnet publish --no-restore --configuration Release --runtime linux-x64 --no-self-contained
 
     - name: Pack linux-x64
-      run: |
-        rawVersion="${{ inputs.version }}"
-        if [ -z "$rawVersion" ]; then rawVersion="1.0.0"; fi
-        tag="$rawVersion"
-        if [[ "$tag" != v* ]]; then tag="v$tag"; fi
-        zip -qq -r "$GITHUB_WORKSPACE/IppPrinter-$tag-linux-x64.zip" *
+      run: zip -qq -r "$GITHUB_WORKSPACE/IppPrinter-linux-x64.zip" *
       working-directory: IppPrinter/bin/Release/net10.0/linux-x64/publish/
 
     - name: Publish osx-x64
       run: dotnet publish --no-restore --configuration Release --runtime osx-x64 --no-self-contained
 
     - name: Pack osx-x64
-      run: |
-        rawVersion="${{ inputs.version }}"
-        if [ -z "$rawVersion" ]; then rawVersion="1.0.0"; fi
-        tag="$rawVersion"
-        if [[ "$tag" != v* ]]; then tag="v$tag"; fi
-        zip -qq -r "$GITHUB_WORKSPACE/IppPrinter-$tag-osx-x64.zip" *
+      run: zip -qq -r "$GITHUB_WORKSPACE/IppPrinter-osx-x64.zip" *
       working-directory: IppPrinter/bin/Release/net10.0/osx-x64/publish/
 
     - name: Upload Zip Artifacts

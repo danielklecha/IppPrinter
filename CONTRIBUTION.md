@@ -112,7 +112,7 @@ When you push a tag starting with `v` (e.g. `v1.0.0`), the workflow triggers aut
    - The `#define MyAppVersion` definition in [installer.iss](Setup/installer.iss).
 4. It publishes the packages for `win-x64`, `linux-x64`, and `osx-x64`.
 5. It compiles the Inno Setup installer.
-6. It creates a GitHub Release and attaches the platform ZIP files and the `IppPrinter-v<version>-Setup.exe` installer file as assets.
+6. It creates a GitHub Release and attaches the platform ZIP files and the `IppPrinter-Setup-x64.exe` installer file as assets.
 
 ---
 

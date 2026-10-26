@@ -1,5 +1,6 @@
-# <img src="icon.svg" width="36" height="36" valign="middle" /> IppPrinter
+# IppPrinter
 
+[![win | installer](https://img.shields.io/badge/win-installer-blue)](https://github.com/danielklecha/IppPrinter/releases/latest/download/IppPrinter-Setup-x64.exe)
 [![GitHub downloads](https://img.shields.io/github/downloads/danielklecha/IppPrinter/total.svg)](https://github.com/danielklecha/IppPrinter/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
@@ -32,7 +33,7 @@ The printer is compatible with any standard IPP client.
 
 ### Windows (GUI Installer)
 
-1. Download `IppPrinter-vX.X.X-x64.exe` from [Releases](https://github.com/danielklecha/IppPrinter/releases).
+1. Download [`IppPrinter-Setup-x64.exe`](https://github.com/danielklecha/IppPrinter/releases/latest/download/IppPrinter-Setup-x64.exe) from [Releases](https://github.com/danielklecha/IppPrinter/releases).
 2. Run the installer wizard as Administrator.
 3. Select your desired **Installation Type**:
    - **Windows Service (Default)**: Runs system-wide in the background before user logon (Session 0). Recommended for headless servers. *Note: Cannot display GUI windows or call interactive desktop applications.*
