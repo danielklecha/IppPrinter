@@ -45,7 +45,8 @@ public static class DocumentConverterExtensions
         float pageWidthPoints = width * scale;
         float pageHeightPoints = height * scale;
 
-        using var bitmap = new SKBitmap(width, height);
+        // We want RGBA; the constructor default is platform-dependent: RGBA on macOS, but BGRA on Windows and Linux.
+        using var bitmap = new SKBitmap(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
         System.Runtime.InteropServices.Marshal.Copy(rgbaPixels, 0, bitmap.GetPixels(), rgbaPixels.Length);
 
         using (var canvas = pdfDocument.BeginPage(pageWidthPoints, pageHeightPoints))
