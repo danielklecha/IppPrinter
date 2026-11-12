@@ -56,7 +56,7 @@ public class PwgRasterConverter : IDocumentConverter
             
             offset += 1796;
 
-            if (width == 0 || height == 0 || bitsPerPixel == 0)
+            if (width == 0 || height == 0 || bitsPerPixel == 0 || bytesPerLine == 0)
                 throw new InvalidDataException("Invalid page dimensions in PWG header.");
 
             uint bytesPerPixel = (bitsPerPixel + 7) / 8;
@@ -74,50 +74,67 @@ public class PwgRasterConverter : IDocumentConverter
                 // Each line starts with a repeat count byte (0 to 255)
                 byte lineRepeat = input[offset++];
 
-                // Decompress pixel data using PackBits (positive = verbatim copy, negative = repeat)
+                // Decompress pixel data (PWG 5102.4 section 4.4): 0-127 repeats the next pixel n + 1
+                // times and 129-255 copies 257 - n pixels verbatim. 128 is not defined by the spec; as in
+                // CUPS, it fills the rest of the line with white for white-based colour spaces, else zero.
                 int bytesWritten = 0;
                 while (bytesWritten < bytesPerLineExpected)
                 {
                     if (offset >= input.Length)
                         break;
 
-                    sbyte command = (sbyte)input[offset++];
-                    if (command >= 0)
+                    byte command = input[offset++];
+                    if (command == 128)
                     {
-                        // Verbatim copy (command + 1) pixels
-                        int count = (command + 1) * (int)bytesPerPixel;
-                        int bytesToRead = Math.Min(count, bytesPerLineExpected - bytesWritten);
-                        
-                        if (offset + bytesToRead > input.Length)
-                            break;
-                            
-                        Array.Copy(input, offset, decompressedLine, bytesWritten, bytesToRead);
-                        offset += bytesToRead;
-                        bytesWritten += bytesToRead;
+                        byte fill = GetWhiteFill(colorSpace, bitsPerPixel);
+                        decompressedLine.AsSpan(bytesWritten, bytesPerLineExpected - bytesWritten).Fill(fill);
+                        bytesWritten = bytesPerLineExpected;
                     }
-                    else if (command > -128)
+                    else if (command > 128)
                     {
-                        // Repeat next single pixel (-command + 1) times
-                        int repeatCount = -command + 1;
-                        int pixelSize = (int)bytesPerPixel;
-                        if (offset + pixelSize > input.Length)
+                        // Verbatim copy (257 - command) pixels
+                        int count = (257 - command) * (int)bytesPerPixel;
+                        int bytesToRead = Math.Min(count, bytesPerLineExpected - bytesWritten);
+
+                        if (offset >= input.Length)
                             break;
-                            
-                        // Read pixel value
-                        ReadOnlySpan<byte> pixelValue = new ReadOnlySpan<byte>(input, offset, pixelSize);
-                        offset += pixelSize;
-                        
-                        for (int i = 0; i < repeatCount && bytesWritten < bytesPerLineExpected; i++)
-                        {
-                            int bytesToCopy = Math.Min(pixelSize, bytesPerLineExpected - bytesWritten);
-                            pixelValue.Slice(0, bytesToCopy).CopyTo(new Span<byte>(decompressedLine, bytesWritten, bytesToCopy));
-                            bytesWritten += bytesToCopy;
-                        }
+
+                        int available = input.Length - offset;
+                        int actualRead = Math.Min(bytesToRead, available);
+                        Array.Copy(input, offset, decompressedLine, bytesWritten, actualRead);
+
+                        // Advance offset across the full run payload in the stream, even if the run overshot the line width
+                        int bytesToConsume = Math.Min(count, available);
+                        offset += bytesToConsume;
+                        bytesWritten += actualRead;
+
+                        if (actualRead < bytesToRead)
+                            break;
                     }
                     else
                     {
-                        // command == -128 is a no-op / ignored in PWG Raster / CUPS Raster
+                        // Repeat next single pixel (command + 1) times
+                        int repeatCount = command + 1;
+                        int pixelSize = (int)bytesPerPixel;
+                        if (offset + pixelSize > input.Length)
+                            break;
+
+                        ReadOnlySpan<byte> pixelValue = input.AsSpan(offset, pixelSize);
+                        offset += pixelSize;
+
+                        for (int i = 0; i < repeatCount && bytesWritten < bytesPerLineExpected; i++)
+                        {
+                            int bytesToCopy = Math.Min(pixelSize, bytesPerLineExpected - bytesWritten);
+                            pixelValue.Slice(0, bytesToCopy).CopyTo(decompressedLine.AsSpan(bytesWritten, bytesToCopy));
+                            bytesWritten += bytesToCopy;
+                        }
                     }
+                }
+
+                // If stream was truncated mid-line, fill remainder with white
+                if (bytesWritten < bytesPerLineExpected)
+                {
+                    decompressedLine.AsSpan(bytesWritten, bytesPerLineExpected - bytesWritten).Fill(GetWhiteFill(colorSpace, bitsPerPixel));
                 }
 
                 // Copy decompressedLine to rgbaPixels row, repeating it lineRepeat + 1 times
@@ -136,4 +153,15 @@ public class PwgRasterConverter : IDocumentConverter
         pdfDocument.Close();
         return pageCount;
     }
+
+    private static byte GetWhiteFill(uint colorSpace, uint bitsPerPixel)
+    {
+        if (bitsPerPixel == 1)
+            return 0x00; // In 1-bit PWG/CUPS raster, 0 = white (ink off), 1 = black (ink on)
+        return IsWhiteBased(colorSpace) ? (byte)0xFF : (byte)0x00;
+    }
+
+    // CUPS_CSPACE_W, RGB, RGBW, SW, SRGB and ADOBERGB: the colour spaces where 0xFF is white.
+    private static bool IsWhiteBased(uint colorSpace) =>
+        colorSpace is 0 or 1 or 17 or 18 or 19 or 20;
 }
