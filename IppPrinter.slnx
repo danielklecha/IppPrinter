@@ -4,4 +4,5 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Project Path="IppPrinter/IppPrinter.csproj" />
+  <Project Path="IppPrinter.Tests/IppPrinter.Tests.csproj" />
 </Solution>
