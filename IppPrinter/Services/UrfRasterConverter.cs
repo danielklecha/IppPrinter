@@ -113,12 +113,20 @@ public class UrfRasterConverter : IDocumentConverter
                         // Verbatim copy (-command + 1) pixels
                         int count = (-command + 1) * (int)bytesPerPixel;
                         int bytesToRead = Math.Min(count, (int)bytesPerLine - bytesWritten);
-                        if (offset + bytesToRead > input.Length)
+                        if (offset >= input.Length)
                             break;
-                            
-                        Array.Copy(input, offset, decompressedLine, bytesWritten, bytesToRead);
-                        offset += bytesToRead;
-                        bytesWritten += bytesToRead;
+
+                        int available = input.Length - offset;
+                        int actualRead = Math.Min(bytesToRead, available);
+                        Array.Copy(input, offset, decompressedLine, bytesWritten, actualRead);
+
+                        // Advance offset across the full run payload in the stream, even if the run overshot the line width
+                        int bytesToConsume = Math.Min(count, available);
+                        offset += bytesToConsume;
+                        bytesWritten += actualRead;
+
+                        if (actualRead < bytesToRead)
+                            break;
                     }
                     else // command == -128 (0x80)
                     {
@@ -143,8 +151,8 @@ public class UrfRasterConverter : IDocumentConverter
                 int repetitions = lineRepeat + 1;
                 for (int r = 0; r < repetitions && row < height; r++)
                 {
-                    // URF Colorspace mapping: 0 -> Grayscale (1), 1 -> sRGB (18)
-                    uint urfColorSpace = colorSpace == 0 ? 1u : 18u;
+                    // URF Colorspace mapping: 0 -> sGray (18), 1 -> sRGB (19)
+                    uint urfColorSpace = colorSpace == 0 ? 18u : 19u;
                     decompressedLine.ConvertLineToRgba(rgbaPixels, row, width, bitsPerPixel, urfColorSpace);
                     row++;
                 }
