@@ -40,18 +40,21 @@ public static class DocumentConverterExtensions
 
     public static void WritePageToPdf(this SKDocument pdfDocument, byte[] rgbaPixels, int width, int height, int dpiX, int dpiY)
     {
-        int dpi = dpiX > 0 ? dpiX : 300;
-        float scale = 72f / dpi;
-        float pageWidthPoints = width * scale;
-        float pageHeightPoints = height * scale;
+        int effectiveDpiX = dpiX > 0 ? dpiX : 300;
+        int effectiveDpiY = dpiY > 0 ? dpiY : effectiveDpiX;
+        float scaleX = 72f / effectiveDpiX;
+        float scaleY = 72f / effectiveDpiY;
+        float pageWidthPoints = width * scaleX;
+        float pageHeightPoints = height * scaleY;
 
         // We want RGBA; the constructor default is platform-dependent: RGBA on macOS, but BGRA on Windows and Linux.
         using var bitmap = new SKBitmap(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
-        System.Runtime.InteropServices.Marshal.Copy(rgbaPixels, 0, bitmap.GetPixels(), rgbaPixels.Length);
+        int bytesToCopy = Math.Min(rgbaPixels.Length, bitmap.ByteCount);
+        System.Runtime.InteropServices.Marshal.Copy(rgbaPixels, 0, bitmap.GetPixels(), bytesToCopy);
 
         using (var canvas = pdfDocument.BeginPage(pageWidthPoints, pageHeightPoints))
         {
-            canvas.Scale(scale, scale);
+            canvas.Scale(scaleX, scaleY);
             canvas.DrawBitmap(bitmap, 0, 0);
         }
         pdfDocument.EndPage();

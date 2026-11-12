@@ -84,6 +84,45 @@ public class PwgRasterConverterTests
     }
 
     [Fact]
+    public async Task ConvertAsync_8BitDeviceBlack_InvertsInkCorrectly()
+    {
+        // 2x1 page, 8 bpp Device Black (CUPS_CSPACE_K = 3), 2 bytes per line
+        // In K: 0 = white (no ink), 255 = black (full ink)
+        // Pixel 1: 0x00 (white -> RGB 255), Pixel 2: 0xFF (black -> RGB 0)
+        byte[] bitmapData =
+        [
+            0x00,
+            0xFF, 0x00, 0xFF // 2 pixels verbatim: 0x00, 0xFF
+        ];
+
+        byte[] raster = PwgRasterTestHelper.CreatePwgRaster(
+            width: 2, height: 1, bitsPerPixel: 8, bytesPerLine: 2, colorSpace: 3, dpi: 72, pageBitmapData: bitmapData);
+
+        using var output = new MemoryStream();
+        int pageCount = await _converter.ConvertAsync(raster, output);
+
+        Assert.Equal(1, pageCount);
+        output.Position = 0;
+        using var pdf = PdfDocument.Open(output);
+        Assert.Equal(1, pdf.NumberOfPages);
+
+        var page = pdf.GetPage(1);
+        var images = page.GetImages().ToList();
+        Assert.Single(images);
+        var image = images[0];
+        Assert.True(image.TryGetBytesAsMemory(out var memory));
+        var span = memory.Span;
+
+        // Pixel 1 (0 ink) should be white (255, 255, 255), Pixel 2 (full ink) should be black (0, 0, 0)
+        Assert.Equal(255, span[0]);
+        Assert.Equal(255, span[1]);
+        Assert.Equal(255, span[2]);
+        Assert.Equal(0, span[3]);
+        Assert.Equal(0, span[4]);
+        Assert.Equal(0, span[5]);
+    }
+
+    [Fact]
     public async Task ConvertAsync_VerbatimRun_24BitRgb_ConvertsSuccessfully()
     {
         // 2x1 page, 24 bpp sRGB (19), 6 bytes per line
@@ -96,7 +135,7 @@ public class PwgRasterConverterTests
         ];
 
         byte[] raster = PwgRasterTestHelper.CreatePwgRaster(
-            width: 2, height: 1, bitsPerPixel: 24, bytesPerLine: 6, colorSpace: 19, dpi: 300, pageBitmapData: bitmapData);
+            width: 2, height: 1, bitsPerPixel: 24, bytesPerLine: 6, colorSpace: 19, dpi: 72, pageBitmapData: bitmapData);
 
         using var output = new MemoryStream();
         int pageCount = await _converter.ConvertAsync(raster, output);
@@ -105,6 +144,20 @@ public class PwgRasterConverterTests
         output.Position = 0;
         using var pdf = PdfDocument.Open(output);
         Assert.Equal(1, pdf.NumberOfPages);
+
+        var page = pdf.GetPage(1);
+        var images = page.GetImages().ToList();
+        Assert.Single(images);
+        var image = images[0];
+        Assert.True(image.TryGetBytesAsMemory(out var memory));
+        var span = memory.Span;
+        // Verify pixel 1 is Red (255, 0, 0) and pixel 2 is Blue (0, 0, 255)
+        Assert.Equal(255, span[0]); // R
+        Assert.Equal(0, span[1]);   // G
+        Assert.Equal(0, span[2]);   // B
+        Assert.Equal(0, span[3]);   // R
+        Assert.Equal(0, span[4]);   // G
+        Assert.Equal(255, span[5]); // B
     }
 
     [Fact]

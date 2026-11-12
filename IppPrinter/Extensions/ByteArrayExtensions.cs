@@ -31,6 +31,10 @@ public static class ByteArrayExtensions
             else if (bitsPerPixel == 8)
             {
                 byte val = srcLine[srcOffset];
+                if (colorSpace == 3) // CUPS_CSPACE_K (Device Black: 0 = white / no ink, 255 = full ink)
+                {
+                    val = (byte)(255 - val);
+                }
                 r = val; g = val; b = val;
             }
             else if (bitsPerPixel == 24)
