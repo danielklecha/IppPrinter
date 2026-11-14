@@ -69,7 +69,7 @@ Filename: "{code:GetJobsDir}"; Description: "Open jobs folder"; Flags: postinsta
 Filename: "{app}"; Description: "Open installation folder"; Flags: postinstall shellexec skipifsilent unchecked
 Filename: "ms-settings:printers"; Description: "Open Windows Printers & Scanners settings"; Flags: postinstall shellexec skipifsilent unchecked
 Filename: "{code:GetInstallLogPath}"; Description: "View installation log"; Flags: postinstall shellexec skipifsilent unchecked
-Filename: "{app}\THIRD-PARTY-NOTICES.txt"; Description: "View third-party licenses and notices"; Flags: postinstall shellexec skipifsilent unchecked
+Filename: "{app}\THIRD-PARTY-NOTICES.md"; Description: "View third-party licenses and notices"; Flags: postinstall shellexec skipifsilent unchecked
 
 [UninstallRun]
 ; 0.5 Stop Windows Service and process synchronously if running

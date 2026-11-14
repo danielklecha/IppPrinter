@@ -100,4 +100,4 @@ For local development setup, building the installer, and integration testing ins
 
 `IppPrinter` is provided as-is under the [MIT license](LICENSE.txt).
 
-For details on third-party dependencies and their licenses, see [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
+For details on third-party dependencies and their licenses, see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

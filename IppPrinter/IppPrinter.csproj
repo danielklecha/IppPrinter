@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\THIRD-PARTY-NOTICES.txt">
-      <Link>THIRD-PARTY-NOTICES.txt</Link>
+    <None Include="..\THIRD-PARTY-NOTICES.md">
+      <Link>THIRD-PARTY-NOTICES.md</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\LICENSE.txt">

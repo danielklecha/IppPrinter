@@ -365,3 +365,5 @@ FodyWeavers.xsd
 # Custom
 /IppPrinter/jobs
 /Setup/Output/
+.license-cache/
+
